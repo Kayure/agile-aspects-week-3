@@ -1,8 +1,7 @@
 main();
 
 function main() {
-  const transactions = [
-    {
+  const transactions = [{
       id: 't1',
       type: 'PAYMENT',
       status: 'OPEN',
@@ -37,50 +36,67 @@ function main() {
 
 function processTransactions(transactions) {
   if (transactions && transactions.length > 0) {
-    for (const transaction of transactions) {
-      if (transaction.type === 'PAYMENT') {
-        if (transaction.status === 'OPEN') {
-          if (transaction.method === 'CREDIT_CARD') {
-            processCreditCardPayment(transaction);
-          } else if (transaction.method === 'PAYPAL') {
-            processPayPalPayment(transaction);
-          } else if (transaction.method === 'PLAN') {
-            processPlanPayment(transaction);
-          }
-        } else {
-          console.log('Invalid transaction type!', transaction);
-        }
-      } else if (transaction.type === 'REFUND') {
-        if (transaction.status === 'OPEN') {
-          if (transaction.method === 'CREDIT_CARD') {
-            processCreditCardRefund(transaction);
-          } else if (transaction.method === 'PAYPAL') {
-            processPayPalRefund(transaction);
-          } else if (transaction.method === 'PLAN') {
-            processPlanRefund(transaction);
-          }
-        } else {
-          console.log('Invalid transaction type!', transaction);
-        }
-      } else {
-        console.log('Invalid transaction type!', transaction);
-      }
-    }
+    transactions.forEach(processTransaction);
   } else {
     console.log('No transactions provided!');
   }
 }
 
-function processCreditCardPayment(transaction) {
-  console.log(
-    'Processing credit card payment for amount: ' + transaction.amount
+function processTransaction(transaction) {
+  if (isValidTransaction(transaction)) {
+    if (transaction.type === 'PAYMENT') {
+      processPayment(transaction);
+    } else if (transaction.type === 'REFUND') {
+      processRefund(transaction);
+    } else {
+      console.log('Invalid transaction type!', transaction);
+    }
+  } else {
+    console.log('Invalid transaction type!', transaction);
+  }
+}
+
+function isValidTransaction(transaction) {
+  return (
+    transaction && ['PAYMENT', 'REFUND'].includes(transaction.type) &&
+    transaction.status === 'OPEN' && ['CREDIT_CARD', 'PAYPAL', 'PLAN'].includes(transaction.method)
   );
 }
 
+function processPayment(transaction) {
+  switch (transaction.method) {
+    case 'CREDIT_CARD':
+      processCreditCardPayment(transaction);
+      break;
+    case 'PAYPAL':
+      processPayPalPayment(transaction);
+      break;
+    case 'PLAN':
+      processPlanPayment(transaction);
+      break;
+  }
+}
+
+function processRefund(transaction) {
+  switch (transaction.method) {
+    case 'CREDIT_CARD':
+      processCreditCardRefund(transaction);
+      break;
+    case 'PAYPAL':
+      processPayPalRefund(transaction);
+      break;
+    case 'PLAN':
+      processPlanRefund(transaction);
+      break;
+  }
+}
+
+function processCreditCardPayment(transaction) {
+  console.log('Processing credit card payment for amount: ' + transaction.amount);
+}
+
 function processCreditCardRefund(transaction) {
-  console.log(
-    'Processing credit card refund for amount: ' + transaction.amount
-  );
+  console.log('Processing credit card refund for amount: ' + transaction.amount);
 }
 
 function processPayPalPayment(transaction) {
